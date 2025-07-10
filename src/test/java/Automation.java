@@ -57,14 +57,50 @@ public class Automation {
 
     @Test
     public void scrapeOpinionArticles(){
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(60000));
-        wait.until(ExpectedConditions.
-                elementToBeClickable(
-                        By.xpath("//button[@id='didomi-notice-agree-button']")
-                ));
-        driver.findElement(By.xpath("//button[@id='didomi-notice-agree-button']")).click();
 
-        driver.findElement(By.xpath("//div[@class='sm _df']//a[@data-mrf-link='https://elpais.com/opinion/']")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+
+        boolean clicked = false;
+
+        // For my local machine : look for the button by id
+        try {
+            WebElement button = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("didomi-notice-agree-button")));
+            wait.until(ExpectedConditions.elementToBeClickable(button));
+            button.click();
+            clicked = true;
+            System.out.println("Clicked button with id=didomi-notice-agree-button.");
+        } catch (Exception e) {
+            System.out.println("didomi-notice-agree-button not found or not clickable: " + e.getMessage());
+        }
+
+        // If !clicked, I try to find the <a> tag with text containing 'Accept and continue' - Automation Browserstack
+        if (!clicked) {
+            try {
+                WebElement link = wait.until(ExpectedConditions.presenceOfElementLocated(
+                        By.xpath("//a[text()='Accept and continue']")
+                ));
+                wait.until(ExpectedConditions.elementToBeClickable(link));
+                link.click();
+                clicked = true;
+                System.out.println("Clicked <a> tag with 'Accept and continue' text.");
+            } catch (Exception e) {
+                System.out.println("Fallback <a> element not found or not clickable: " + e.getMessage());
+            }
+            System.out.println("Clicked <a> tag with 'Accept and continue' text.");
+        }
+
+        // After handling consent, click your target div link regardless
+        try {
+            WebElement opinionLink = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//div[@class='sm _df']//a[@data-mrf-link='https://elpais.com/opinion/']")
+            ));
+            opinionLink.click();
+            System.out.println("Clicked opinion link successfully.");
+        } catch (Exception e) {
+            System.out.println("Failed to click the opinion link: " + e.getMessage());
+        }
+
+
         List<WebElement> articles = driver.findElements(By.tagName("article"));
         List<Map<String,String>> articleInfo = new ArrayList<>();
 
