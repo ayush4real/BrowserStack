@@ -34,7 +34,7 @@ public class Automation {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.get("https://elpais.com/");
-        new WebDriverWait(driver, Duration.ofSeconds(20)).until(
+        new WebDriverWait(driver, Duration.ofSeconds(60)).until(
                 wd -> "complete".equals(
                         ((JavascriptExecutor) wd).executeScript("return document.readyState")
                 )
@@ -86,7 +86,6 @@ public class Automation {
             } catch (Exception e) {
                 System.out.println("Fallback <a> element not found or not clickable: " + e.getMessage());
             }
-            System.out.println("Clicked <a> tag with 'Accept and continue' text.");
         }
 
         // After handling consent, click your target div link regardless
